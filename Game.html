@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch the Falling Objects</title>
+    <style>
+        body {
+            text-align: center;
+        }
+        canvas {
+            background: lightblue;
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Catch the Falling Apples!</h1>
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let basket = { x: 175, y: 450, width: 50, height: 20 };
+        let apples = [];
+        let score = 0;
+        let gameOver = false;
+
+        function drawBasket() {
+            ctx.fillStyle = "brown";
+            ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
+        }
+
+        function drawApples() {
+            ctx.fillStyle = "red";
+            apples.forEach(apple => {
+                ctx.beginPath();
+                ctx.arc(apple.x, apple.y, 10, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function moveApples() {
+            apples.forEach((apple, index) => {
+                apple.y += 3;
+                if (apple.y > canvas.height) {
+                    gameOver = true;
+                }
+                if (
+                    apple.y + 10 >= basket.y &&
+                    apple.x >= basket.x &&
+                    apple.x <= basket.x + basket.width
+                ) {
+                    apples.splice(index, 1);
+                    score++;
+                }
+            });
+        }
+
+        function spawnApple() {
+            let x = Math.random() * (canvas.width - 20) + 10;
+            apples.push({ x: x, y: 0 });
+        }
+
+        function updateGame() {
+            if (gameOver) {
+                alert("Game Over! Your score: " + score);
+                document.location.reload();
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBasket();
+            drawApples();
+            moveApples();
+            requestAnimationFrame(updateGame);
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft" && basket.x > 0) {
+                basket.x -= 20;
+            } else if (event.key === "ArrowRight" && basket.x < canvas.width - basket.width) {
+                basket.x += 20;
+            }
+        });
+
+        setInterval(spawnApple, 1000);
+        updateGame();
+    </script>
+</body>
+</html>
